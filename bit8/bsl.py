@@ -5,7 +5,7 @@ def parse_file(f):
     w = 0
     for line in f:
         if line[0] == ':':
-            cur = line[1:].strip()
+            cur = line[1:].strip('\n')
             r[cur] = []
         elif line[0] == '|':
             if line[1] == '=':

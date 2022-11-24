@@ -1,3 +1,5 @@
+#!/mnt/c/WINDOWS/py.exe
+
 from bit8 import render, COLORS
 from bit8.utils import overlay, solid, ScreenClass, adjoin, recolor
 from bit8.game import overlapping_area
@@ -23,10 +25,9 @@ HEIGHT, WIDTH = 50, 50
 PADDLE_WIDTH = 4
 BALL_SIZE = 2
 
-NUMBERS = parse_file('numbers.scr')
+score = 0
 
-render(number_screen(1234567890))
-exit()
+NUMBERS = parse_file('numbers.scr')
 
 board = solid(HEIGHT, WIDTH, 'n')
 paddle = solid(1, PADDLE_WIDTH, 'g')
@@ -47,8 +48,9 @@ try:
         if not 0 < ball_pos[1] < WIDTH - BALL_SIZE: theta = - theta
         elif overlapping_area((HEIGHT - 5, paddle_pos), (1, PADDLE_WIDTH), ball_pos, (BALL_SIZE, BALL_SIZE)) >= 0:
             theta *= ball_pos[1] - paddle_pos
+            score += 1
 
-        render(adjoin(overlay(overlay(board, ball, tuple(map(int, ball_pos))), paddle, (HEIGHT - 5, paddle_pos)), number_screen(856)))
+        render(adjoin(overlay(overlay(board, ball, tuple(map(int, ball_pos))), paddle, (HEIGHT - 5, paddle_pos)), number_screen(score)))
         sleep(0.02)
 except KeyboardInterrupt:
     pass

@@ -1,4 +1,7 @@
+import atexit
+
 COLORS = 'nrgybpcw'
+CURSOR_VISIBILITY = True
 
 class ansi:
     up = staticmethod(lambda x: print(end=f'\033[{x}A'))
@@ -26,9 +29,23 @@ class ansi:
         else: ansi.right(delta[1])
         current_location = new_location
 
+    @staticmethod
+    def show_cursor():
+        global CURSOR_VISIBILITY
+        CURSOR_VISIBILITY = True
+        print(end='\x1b[?25h')
+
+    @staticmethod
+    def hide_cursor():
+        global CURSOR_VISIBILITY
+        CURSOR_VISIBILITY = True
+        print(end='\x1b[?25l')
+
 cursor = [0, 0]
 
 def render(scr):
+    if CURSOR_VISIBILITY:
+        ansi.hide_cursor()
     global cursor
     ansi.move_cursor(cursor, [0, 0])
     cursor = [0, 0]
@@ -43,6 +60,8 @@ def render(scr):
         print()
         cursor[0] += 1
         # cursor[1] = 0
+
+atexit.register(ansi.show_cursor)
 
 def screen_from_str(s):
     return [[x.lower() if x != ' ' else 'n' for x in y] for y in s.strip().split('\n')]
