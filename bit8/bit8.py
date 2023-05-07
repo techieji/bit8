@@ -17,8 +17,10 @@ class ansi:
         bgl = ansi.background_color_codes.get(bg)
         if fg == ' ': fgl = '30'  # need to make it transparent
         if bg == ' ': bgl = '30'
-        if fgl: print(end=f'\033[{fgl}m')
-        if bgl: print(end=f'\033[{bgl}m')
+        if type(fgl) is tuple: print(end='\033[38;2;' + ';'.join(map(str, fgl)) + 'm')
+        elif fgl: print(end=f'\033[{fgl}m')
+        if type(bgl) is tuple: print(end='\033[48;2;' + ';'.join(map(str, bgl)) + 'm')
+        elif bgl: print(end=f'\033[{bgl}m')
 
     @staticmethod
     def move_cursor(current_location, new_location):
@@ -38,7 +40,7 @@ class ansi:
     @staticmethod
     def hide_cursor():
         global CURSOR_VISIBILITY
-        CURSOR_VISIBILITY = True
+        CURSOR_VISIBILITY = False
         print(end='\x1b[?25l')
 
 cursor = [0, 0]
