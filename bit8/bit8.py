@@ -1,4 +1,6 @@
 import atexit
+import sys
+import io
 
 COLORS = 'nrgybpcw'
 CURSOR_VISIBILITY = True
@@ -17,9 +19,9 @@ class ansi:
         bgl = ansi.background_color_codes.get(bg)
         if fg == ' ': fgl = '30'  # need to make it transparent
         if bg == ' ': bgl = '30'
-        if type(fgl) is tuple: print(end='\033[38;2;' + ';'.join(map(str, fgl)) + 'm')
+        if type(fg) is tuple: print(end='\033[38;2;' + ';'.join(map(str, fg)) + 'm')
         elif fgl: print(end=f'\033[{fgl}m')
-        if type(bgl) is tuple: print(end='\033[48;2;' + ';'.join(map(str, bgl)) + 'm')
+        if type(bg) is tuple: print(end='\033[48;2;' + ';'.join(map(str, bg)) + 'm')
         elif bgl: print(end=f'\033[{bgl}m')
 
     @staticmethod
@@ -45,12 +47,13 @@ class ansi:
 
 cursor = [0, 0]
 
-def render(scr):
-    if CURSOR_VISIBILITY:
-        ansi.hide_cursor()
-    global cursor
-    ansi.move_cursor(cursor, [0, 0])
-    cursor = [0, 0]
+def render(scr, move_cursor=True):
+    if move_cursor:
+        if CURSOR_VISIBILITY:
+            ansi.hide_cursor()
+        global cursor
+        ansi.move_cursor(cursor, [0, 0])
+        cursor = [0, 0]
     pixels = scr.copy()
     if len(pixels) % 2 == 1: pixels.append(['n'] * len(scr[0]))
     raw_pixels = list(zip(*[iter(pixels)] * 2))
@@ -58,10 +61,15 @@ def render(scr):
         for bg, fg in zip(x, y):
             ansi.set_colors(fg, bg)
             print(end='▄')
-            # cursor[1] += 1
         print()
-        cursor[0] += 1
-        # cursor[1] = 0
+        if move_cursor: cursor[0] += 1
+
+def as_str(scr):
+    sys.stdout = io.StringIO()
+    render(scr, move_cursor=False)
+    s = sys.stdout.getvalue()
+    sys.stdout = sys.__stdout__
+    return s
 
 atexit.register(ansi.show_cursor)
 
