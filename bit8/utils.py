@@ -24,11 +24,14 @@ def recolor(scr, c1, c2):
     lk = dict(zip(c1, c2))
     return [[lk.get(x, x) for x in y] for y in scr]  # Really have to improve performance
 
-def adjoin(scr1, scr2, direction='horizontal'):
+def transpose(scr):
+    return list(zip(*scr))
+
+def adjoin(scr1, scr2, direction='horizontal', buffer=0):
     s1 = deepcopy(scr1)
     if direction == 'horizontal':
         for i, row in enumerate(scr2):
-            s1[i] += row
+            s1[i] += list('n' * buffer) + row
         return s1
     elif direction == 'vertial':
-        return NotImplemented
+        return transpose(adjoin(transpose(scr1), transpose(scr2)))   # IDK if this works
