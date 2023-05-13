@@ -2,6 +2,9 @@
 
 import itertools as it
 import operator as op
+from .bit8 import ansi
+import sys
+import io
 
 def ipad(scr):
     for x in scr:
@@ -34,9 +37,12 @@ def render(scr, move_cursor=True):
         for x in y:
             print(unit_to_braille(x), end='')
         print()
-
-from random import randint
-render([[randint(0, 1) for _ in range(60)] for _ in range(60)])
+    if move_cursor:
+        ansi.up(len(l))
 
 def as_str(scr):
-    pass
+    sys.stdout = io.StringIO()
+    render(scr, move_cursor=False)
+    s = sys.stdout.getvalue()
+    sys.stdout = sys.__stdout__
+    return s
