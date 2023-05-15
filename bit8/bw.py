@@ -6,6 +6,19 @@ from .bit8 import ansi
 import sys
 import io
 
+class ForgivingList(list):
+    def __init__(self, l, default):
+        super().__init__(l)
+        self.default = default
+    def __getitem__(self, k):
+        try:
+            r = list.__getitem__(self, k)
+            if type(r) is list:
+                return ForgivingList(r, self.default.default)   # Not general purpose
+            return r
+        except IndexError:
+            return self.default
+
 def ipad(scr):
     for x in scr:
         if len(x) % 2 != 0:
@@ -14,9 +27,10 @@ def ipad(scr):
         for _ in range(len(scr) % 4):
             scr.append([0] * len(scr[0]))
 
-def screen_to_units(scr):
+def screen_to_units(_scr):
     xsize = 2
     ysize = 4
+    scr = ForgivingList(_scr, ForgivingList([], default=0))
     # Pray forgive this monstrosity, O God, for the pains of pragmatricity needle me far more so than
     # that lofty ideal of mathematical purity, held for too long in its ivory tower. Shine your light
     # on one who is undeserving, this man to whom hope has fled like the wisdom of his ancestors long

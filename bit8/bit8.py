@@ -10,6 +10,7 @@ class ansi:
     down = staticmethod(lambda x: print(end=f'\033[{x}B'))
     right = staticmethod(lambda x: print(end=f'\033[{x}C'))
     left = staticmethod(lambda x: print(end=f'\033[{x}D'))
+    reset = staticmethod(lambda: print(end='\033[0m'))
     background_color_codes = dict(zip(COLORS, range(40, 48)))    # n: "noir", c: cyan
     foreground_color_codes = dict(zip(COLORS, range(30, 38)))
 
@@ -45,6 +46,9 @@ class ansi:
         CURSOR_VISIBILITY = False
         print(end='\x1b[?25l')
 
+atexit.register(ansi.show_cursor)
+atexit.register(ansi.reset)
+
 cursor = [0, 0]
 
 def render(scr, move_cursor=True):
@@ -70,8 +74,6 @@ def as_str(scr):
     s = sys.stdout.getvalue()
     sys.stdout = sys.__stdout__
     return s
-
-atexit.register(ansi.show_cursor)
 
 def screen_from_str(s):
     return [[x.lower() if x != ' ' else 'n' for x in y] for y in s.strip().split('\n')]
